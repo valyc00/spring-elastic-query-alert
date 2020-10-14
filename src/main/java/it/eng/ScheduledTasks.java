@@ -30,12 +30,13 @@ public class ScheduledTasks {
 	
 	@Autowired
 	ElasticQueryService elasticQueryService;
+	int fixedDelay = 2000;
 
     private static final Logger logger = LoggerFactory.getLogger(ScheduledTasks.class);
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    @Scheduled(fixedRate = 2000)
+    @Scheduled(fixedRateString  = "${fixedRateString}")
     public void scheduleTaskWithFixedRate() {
         logger.info("Fixed Rate Task :: Execution Time - {}", dateTimeFormatter.format(LocalDateTime.now()) );
         
