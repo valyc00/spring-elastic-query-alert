@@ -51,9 +51,12 @@
 		<plugins>
 			<!-- Package as an executable jar/war -->
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <configuration>  <!-- added -->
+                <layout>ZIP</layout> <!-- to use PropertiesLaunchar -->
+            </configuration>
+        </plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

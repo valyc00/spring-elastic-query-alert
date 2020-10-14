@@ -1,15 +1,21 @@
 package it.eng;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.client.RestTemplate;
 
 @Service
@@ -19,6 +25,12 @@ public class ElasticQueryService {
     
     @Autowired
     ScheduledTasks scheduledTasks;
+    @Value( "${elastic.url}" )
+    private String url;
+    
+    private static boolean read=false;
+
+   
 
     public ElasticQueryService() {
       
@@ -41,35 +53,19 @@ public class ElasticQueryService {
 
     	// build the request
     	
-    	//String url = "localhost:9200/logstash*/_search?";
-    	String url = "http://ip172-18-0-48-bu3fq41qckh000bkmntg-9200.direct.labs.play-with-docker.com/logstash*/_search?";
+    	
+    	//Read File Content
+    	String content = null;
+    	if(!read) {
+    		content = readQueryFile();
+    	}
     	
     	
-		String requestJson="{\r\n" + 
-				"   \"size\":100,\r\n" + 
-				"   \"query\":{\r\n" + 
-				"      \"bool\":{\r\n" + 
-				"         \"must\":[\r\n" + 
-				"            {\r\n" + 
-				"               \"range\":{\r\n" + 
-				"                  \"@timestamp\":{\r\n" + 
-				"                     \"gte\":\"2020-10-14 00:00:00.000\",\r\n" + 
-				"                     \"lte\":\"2020-10-14 23:59:59.999\",\r\n" + 
-				"                     \"format\":\"yyyy-MM-dd HH:mm:ss.SSS\"\r\n" + 
-				"                  }\r\n" + 
-				"               }\r\n" + 
-				"            },\r\n" + 
-				"            {\r\n" + 
-				"               \"match\":{\r\n" + 
-				"                  \"user\":\"vale\"\r\n" + 
-				"               }\r\n" + 
-				"            }\r\n" + 
-				"         ]\r\n" + 
-				"      }\r\n" + 
-				"   }\r\n" + 
-				"}";
+    	
+    	
+	
 		// send POST request
-    	HttpEntity<String> request = new HttpEntity<String>(requestJson, headers);
+    	HttpEntity<String> request = new HttpEntity<String>(content, headers);
     	ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
 
     	// check response
@@ -81,7 +77,7 @@ public class ElasticQueryService {
     	    
     	    int value = gb.getInt("value");
     	    System.out.println("value:"+value);
-    	    if(value>3) {
+    	    if(value>10) {
     	    	scheduledTasks.sendEmail();
     	    	System.out.println("sent mail!!!!!");
     	    }
@@ -94,6 +90,29 @@ public class ElasticQueryService {
     	
     	return "ok";
         
+    }
+    
+    
+    private String readQueryFile() {
+    	
+    	
+    	//Read File Content
+    			String content = null;
+    			try {
+    				File file = ResourceUtils.getFile("classpath:query.txt");
+
+    				content = new String(Files.readAllBytes(file.toPath()));
+    			} catch (FileNotFoundException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			} catch (IOException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
+    			System.out.println(content);
+    			this.read=true;
+				return content;
+    	
     }
 
 
