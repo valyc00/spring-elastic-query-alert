@@ -5,7 +5,7 @@
 	http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>spring-boot-send-email</artifactId>
+	<artifactId>spring-elastic-query-alert</artifactId>
 	<packaging>jar</packaging>
 	<name>Spring Boot Send Email</name>
 	<url>https://www.mkyong.com</url>
